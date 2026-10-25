@@ -189,4 +189,5 @@ python tools/scripts/verify_golden.py --layer L3 --inject-x
 - **数据**：网格由 gmsh 生成，B-H 曲线 `50CS470.csv` 取自硅钢片手册；
   ANSYS Maxwell 结果只出现在对账记录里，计算过程用本仓库自己的求解器完成。
 - **第三方**：SciPy、NumPy、numba、matplotlib、shapely；SuiteSparse CHOLMOD 与 MKL 为可选后端。
+- **许可**：MIT，全文见 [LICENSE](LICENSE)。
 - 本仓库的范围是 2D 静磁、线弹性与 SIMP/MMA 三条主线；3D、热耦合、转子动力学在范围之外。
