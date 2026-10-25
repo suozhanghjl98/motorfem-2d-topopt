@@ -1,0 +1,42 @@
+{
+  "file": "model_6s4p.msh",
+  "notes": "6s4p 口径（6s4p）",
+  "run_config": {
+    "electrical": {
+      "winding": {
+        "N_conductor": 20,
+        "Z": 6,
+        "current_amp": 30.0,
+        "inner_ref": "start",
+        "outer_ref": "center",
+        "outer_shift": 0,
+        "parts": 2,
+        "phase_from_generator": true,
+        "pole_pairs": 2
+      }
+    },
+    "geometry": {
+      "Z": 6,
+      "arkkio_gap_m": 0.0005,
+      "arkkio_parts_exponent": 1,
+      "parts": 2,
+      "pole_pairs": 2,
+      "rotor_design_half_pole": true,
+      "rotor_outer_radius_m": 0.0445,
+      "shaft_radius_m": 0.015,
+      "stator_inner_radius_m": 0.045,
+      "stator_outer_radius_m": 0.0802059
+    },
+    "solver": {
+      "EM_MS_boundary_A_eq": true
+    },
+    "time": {
+      "N_point_simulation": 11,
+      "phaseA_offset_deg": -29.827,
+      "rotor_position0_deg": 22.5,
+      "time_simulation_s": 0.006666666666666667
+    }
+  },
+  "schema_version": 1,
+  "sha256": null
+}

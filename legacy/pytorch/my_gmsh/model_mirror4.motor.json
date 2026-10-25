@@ -1,0 +1,42 @@
+{
+  "file": "model_mirror4.msh",
+  "notes": "沿用 RunConfig() 默认（legacy 36 槽口径）",
+  "run_config": {
+    "electrical": {
+      "winding": {
+        "N_conductor": 20,
+        "Z": 36,
+        "current_amp": 5,
+        "inner_ref": "edge",
+        "outer_ref": "edge",
+        "outer_shift": 1,
+        "parts": 4,
+        "phase_from_generator": false,
+        "pole_pairs": 2
+      }
+    },
+    "geometry": {
+      "Z": 36,
+      "arkkio_gap_m": null,
+      "arkkio_parts_exponent": 1,
+      "parts": 4,
+      "pole_pairs": 2,
+      "rotor_design_half_pole": false,
+      "rotor_outer_radius_m": 0.04475,
+      "shaft_radius_m": 0.015,
+      "stator_inner_radius_m": 0.045,
+      "stator_outer_radius_m": 0.0725
+    },
+    "solver": {
+      "EM_MS_boundary_A_eq": false
+    },
+    "time": {
+      "N_point_simulation": 11,
+      "phaseA_offset_deg": 0.0,
+      "rotor_position0_deg": 22.5,
+      "time_simulation_s": 0.0011111111111111111
+    }
+  },
+  "schema_version": 1,
+  "sha256": null
+}

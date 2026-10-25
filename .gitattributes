@@ -1,0 +1,12 @@
+# 文本文件在仓库内存 LF，Windows 上的 .cmd 保持 CRLF
+* text=auto
+*.py   text eol=lf
+*.md   text eol=lf
+*.txt  text eol=lf
+*.json text eol=lf
+*.cmd  text eol=crlf
+
+# 二进制
+*.npz binary
+*.msh binary
+*.png binary

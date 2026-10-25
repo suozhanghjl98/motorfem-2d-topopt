@@ -1,0 +1,157 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f5f6f8;
+  --card: #ffffff;
+  --line: #dde1e6;
+  --fg: #1c1e21;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --danger: #dc2626;
+  --ok: #16a34a;
+}
+
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 13px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+header h1 { font-size: 16px; }
+.header-right { display: flex; gap: 10px; align-items: center; }
+
+main {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: 12px;
+  padding: 12px 16px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+aside { display: flex; flex-direction: column; gap: 12px; }
+#main-area { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.card h2 {
+  font-size: 13px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+.row label { width: 96px; flex: 0 0 96px; color: var(--muted); }
+.row input[type=text], .row input[type=number] {
+  flex: 1;
+  min-width: 0;              /* 允许输入框收缩，避免把同排按钮挤换行 */
+  padding: 4px 6px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.row button {
+  flex: 0 0 auto;            /* 按钮不收缩 */
+  white-space: nowrap;       /* 按钮文字不换行（浏览… 保持单行） */
+}
+
+.btnrow { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+button {
+  padding: 5px 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+}
+button:hover:not(:disabled) { background: #eef2f7; }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.primary:hover:not(:disabled) { background: #1d4ed8; }
+button.danger { color: var(--danger); border-color: var(--danger); }
+button.small { font-size: 11px; padding: 2px 6px; }
+
+#config-form .cfg-group { margin-bottom: 8px; }
+#config-form .cfg-group h3 {
+  font-size: 12px;
+  color: var(--muted);
+  border-bottom: 1px dashed var(--line);
+  padding-bottom: 2px;
+  margin-bottom: 4px;
+}
+.cfg-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.cfg-row label { flex: 1; color: #374151; }
+.cfg-row input[type=text], .cfg-row input[type=number] {
+  width: 92px;
+  padding: 3px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  text-align: right;
+}
+.cfg-row select { width: 108px; padding: 3px; border: 1px solid var(--line); border-radius: 4px; }
+.cfg-row input[type=checkbox] { width: 16px; height: 16px; }
+
+#sel-saves { width: 100%; margin-top: 6px; font-size: 12px; }
+
+/* 性能优化的折叠详细菜单 */
+details.cfg-details { margin: 2px 0 6px 0; }
+details.cfg-details summary {
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--accent);
+  user-select: none;
+  padding: 2px 0;
+}
+
+#stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.stat { display: flex; flex-direction: column; }
+.stat b { font-size: 16px; }
+.stat span { color: var(--muted); font-size: 11px; }
+
+canvas {
+  width: 100%;
+  height: auto;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+#geom { min-height: 480px; }
+#traj { min-height: 300px; }
+
+.chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #fff;
+}
+.chip.idle { background: #9ca3af; }
+.chip.building, .chip.loading { background: #d97706; }
+.chip.running { background: var(--ok); }
+.chip.paused { background: var(--accent); }
+.chip.stopping { background: #d97706; }
+.chip.stopped { background: #9ca3af; }
+.chip.done { background: var(--ok); }
+.chip.error { background: var(--danger); }
+
+.muted { color: var(--muted); }
+.hidden { display: none; }
+#in-json { width: 100%; font-family: Consolas, monospace; font-size: 11px; }

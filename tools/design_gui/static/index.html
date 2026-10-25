@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="design-gui-token" content="__DESIGN_GUI_TOKEN__">
+<title>转子初始结构绘制 GUI</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>转子初始结构绘制 <span class="sub">手绘 ρ → 全自由度优化起点</span></h1>
+  <div class="header-right">
+    <label class="inline">网格
+      <select id="motor" title="切换电机网格（切换会重新构建几何，约 8 s）"></select>
+    </label>
+    <span id="build-chip" class="chip busy">几何构建中…</span>
+    <span id="job-chip" class="chip idle">优化空闲</span>
+  </div>
+</header>
+
+<main>
+  <section id="canvas-wrap">
+    <canvas id="bg"></canvas>
+    <canvas id="fg"></canvas>
+    <canvas id="ov"></canvas>
+    <div id="canvas-hint">几何构建中，请稍候…（约 8 s）</div>
+    <div id="statusbar">
+      <span id="cursor-info">—</span>
+      <span id="shape-info"></span>
+      <span id="zoom-info"></span>
+    </div>
+  </section>
+
+  <aside>
+    <section class="card">
+      <h2>工具</h2>
+      <div class="tools" id="tools">
+        <button data-tool="brush"    class="tool active" title="画笔 (B)：按密度滑杆填色">画笔</button>
+        <button data-tool="eraser"   class="tool" title="橡皮 (E)：ρ=0">橡皮</button>
+        <button data-tool="line"     class="tool" title="直线 (L)：拖动，按笔刷半径加宽">直线</button>
+        <button data-tool="rect"     class="tool" title="矩形 (R)：拖动填充">矩形</button>
+        <button data-tool="circle"   class="tool" title="圆 (C)：拖动填充">圆</button>
+        <button data-tool="ring"     class="tool" title="圆环扇区 (O)：从内半径拖到外半径；角度由拖动方向决定">圆环扇区</button>
+        <button data-tool="polygon"  class="tool" title="多边形套索 (P)：逐点点击，Enter/双击闭合">套索</button>
+      </div>
+      <div class="row">
+        <label>笔刷半径 <b id="brush-label">1.5</b> mm</label>
+        <input id="brush-radius" type="range" min="0.3" max="8" step="0.1" value="1.5">
+        <input id="brush-radius-num" type="number" min="0.3" max="8" step="0.1" value="1.5">
+      </div>
+      <div class="row">
+        <label>密度 ρ <b id="value-label">1.00</b></label>
+        <input id="paint-value" type="range" min="0" max="1" step="0.01" value="1">
+        <input id="paint-value-num" type="number" min="0" max="1" step="0.01" value="1">
+      </div>
+      <div class="btnrow">
+        <button id="quick-solid" class="small" title="把密度设为 1（画材料）">画材料</button>
+        <button id="quick-air" class="small" title="把密度设为 0（挖空）">挖空</button>
+        <button id="undo" class="small" title="Ctrl+Z">撤销</button>
+        <button id="redo" class="small" title="Ctrl+Shift+Z">重做</button>
+      </div>
+      <div class="btnrow">
+        <button id="fill-all" class="small">全填充</button>
+        <button id="clear-all" class="small">全清空</button>
+        <button id="fit-view" class="small">适配视图</button>
+        <button id="focus-master" class="small">聚焦主域</button>
+      </div>
+      <p class="hint">左键绘制；右键反向（画笔↔橡皮）；空格/中键拖拽平移；滚轮缩放；Esc 取消当前形状。</p>
+    </section>
+
+    <section class="card">
+      <h2>显示与滤波</h2>
+      <div class="row">
+        <label>密度滤波半径 <b id="radius-label">2.00</b> mm</label>
+        <input id="filter-radius" type="range" min="0.1" max="2.5" step="0.05" value="2">
+        <input id="filter-radius-num" type="number" min="0.1" max="10" step="0.05" value="2">
+      </div>
+      <div class="btnrow" id="radius-presets">
+        <button class="small" data-r="2">2.0</button>
+        <button class="small" data-r="1">1.0</button>
+        <button class="small" data-r="0.5">0.5</button>
+        <button class="small" data-r="ident" id="preset-ident">恒等 (~0.20)</button>
+      </div>
+      <label class="check"><input id="preview-filter" type="checkbox"> 显示滤波后的实际起点 ρ（调服务端）</label>
+      <label class="check"><input id="edit-slaves" type="checkbox" checked> 允许在镜像副本区绘制</label>
+      <label class="check"><input id="show-slaves" type="checkbox" checked> 显示镜像副本区</label>
+      <details>
+        <summary>高级：起点口径</summary>
+        <label class="check"><input id="x-preimage" type="checkbox"> 反滤波求前像（默认关；不能恢复小于滤波尺度的细节）</label>
+      </details>
+      <p class="hint">半径越小越能保留手绘细节；0.2 mm 已 ≈ 无滤波（半径 0 非法）。</p>
+    </section>
+
+    <section class="card">
+      <h2>设计状态</h2>
+      <div id="design-stats" class="stats">—</div>
+      <div id="density-warn" class="warn hidden"></div>
+    </section>
+
+    <section class="card">
+      <h2>保存 / 导入</h2>
+      <div class="row">
+        <label>名称</label>
+        <input id="design-name" type="text" value="hand_design" spellcheck="false">
+        <button id="save" class="primary small">保存 NPZ</button>
+      </div>
+      <div class="btnrow">
+        <button id="refresh-designs" class="small">刷新列表</button>
+        <button id="import-browse" class="small">导入 NPZ…</button>
+      </div>
+      <select id="designs" size="5" title="已保存的手绘设计"></select>
+      <div class="btnrow">
+        <button id="load-design" class="small">载入选中设计</button>
+      </div>
+      <p id="save-msg" class="hint"></p>
+    </section>
+
+    <section class="card">
+      <h2>优化</h2>
+      <div class="row">
+        <label>阶段链预设</label>
+        <select id="stage-preset">
+          <option value="S0:T=50,R=80">S0:T=50,R=80（默认）</option>
+          <option value="S0:T=1">S0:T=1（纯基准）</option>
+          <option value="night">night（6 档）</option>
+          <option value="stress">stress（应力轴）</option>
+          <option value="rip">rip（脉振轴）</option>
+          <option value="">自定义</option>
+        </select>
+      </div>
+      <div class="row">
+        <label>stages</label>
+        <input id="stages" type="text" value="S0:T=50,R=80" spellcheck="false"
+               title="用 | 或 ; 分隔；例如 S0:T=50,R=80|S1:T=52,R=60">
+      </div>
+      <div class="grid2">
+        <label>每档评价 <input id="max-eval" type="number" min="1" value="100"></label>
+        <label>MMA move <input id="mma-move" type="number" min="0.001" max="0.5" step="0.005" value="0.05"></label>
+        <label>训练点 <input id="n-train" type="number" min="3" value="11"></label>
+        <label>验证点 <input id="n-eval" type="number" min="0" value="6"></label>
+        <label>密度上限 <input id="max-density" type="number" min="0.1" max="1" step="0.01" value="0.65"></label>
+        <label class="check-inline"><input id="strict" type="checkbox"> 严格模式</label>
+      </div>
+      <div class="row">
+        <label>额外参数</label>
+        <input id="extra-args" type="text" placeholder="可留空，例如 --n-min 20" spellcheck="false">
+      </div>
+      <div class="btnrow">
+        <button id="start-opt" class="primary">保存并启动优化</button>
+        <button id="stop-opt" class="danger small">停止</button>
+      </div>
+      <div id="job-status" class="stats">空闲</div>
+      <pre id="job-log" class="log" aria-live="polite"></pre>
+      <details>
+        <summary>只读监视 GUI 命令</summary>
+        <pre id="monitor-cmd" class="log"></pre>
+      </details>
+    </section>
+  </aside>
+</main>
+
+<div id="modal-backdrop" class="hidden">
+  <div id="modal">
+    <h2>导入 NPZ</h2>
+    <p id="import-path" class="hint"></p>
+    <div class="row">
+      <label>键</label>
+      <select id="import-key" size="8"></select>
+    </div>
+    <div class="grid2">
+      <label>按 2D 行 <input id="import-row" type="number" value="-1" title="-1 = 最后一行/列"></label>
+      <label>来源
+        <select id="import-as">
+          <option value="auto">自动</option>
+          <option value="rho">密度 ρ</option>
+          <option value="x">设计变量 x</option>
+        </select>
+      </label>
+      <label>源滤波半径 (mm) <input id="import-radius" type="number" min="0.1" step="0.05" value="2"></label>
+    </div>
+    <p id="import-note" class="hint"></p>
+    <div class="btnrow">
+      <button id="import-apply" class="primary">载入画布</button>
+      <button id="import-cancel">取消</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/api.js"></script>
+<script src="/static/geometry.js"></script>
+<script src="/static/paint.js"></script>
+<script src="/static/render.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+# 提交包依赖（开发机实测版本见行尾注释）
+# 安装：python -m pip install -r requirements.txt
+#
+# ⚠ 必须用 --only-binary=:all: 或保证 wheel 可用：
+#   Python 3.12 上 numpy==1.26.x 没有 cp312 wheel，会尝试源码编译并失败。
+
+numpy>=1.26,<2.6        # 1.26.2
+scipy>=1.12             # 1.12.0
+matplotlib>=3.8         # 3.8.2
+shapely>=2.0            # 2.0.1
+sympy>=1.14             # 1.14.0
+joblib>=1.4             # 1.4.2
+
+# ⚠ numba 是**必需**依赖：RunConfig() 默认 bh_lut_n=65536（B-H 查表开），
+#   缺 numba 时 approx/bh_lut 直接 ImportError。
+#   若确实无法安装，包内会由 _bundle_env.py 自动回落 bh_lut_n=0（结果更精确、稍慢）。
+numba>=0.60             # 0.60.0
+
+# 仅用于重新生成网格（跑现有 .msh 不需要）
+gmsh>=4.13              # 4.13.1
+
+# ---------------------------------------------------------------------------
+# 可选：启用 CHOLMOD 后端（6.99× 分解加速的来源）
+# ---------------------------------------------------------------------------
+# CHOLMOD 不是 pip 包 —— 项目通过 ctypes 直接加载 cholmod.dll。
+# 在 Windows 上可用 conda 安装：
+#     conda install -c conda-forge suitesparse mkl
+# 然后把环境变量 CHOLMOD_DLL_DIR 指向含 cholmod.dll 与 MKL 运行时的目录。
+# 没有它时包内自动使用 superlu（结果与 golden 逐位一致，只是慢约 2.7×）。
+#
+# 也可用 MKL 的 Pardiso 后端：pip install pypardiso
+# 注意：MKL 仅支持 x86-64，且运行时按 CPU 指令集 dispatch。

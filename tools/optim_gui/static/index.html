@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SynRM 拓扑优化 GUI</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>SynRM 拓扑优化（MMA + 网页控制台）</h1>
+  <div class="header-right">
+    <span id="power" class="muted"></span>
+    <span id="status-chip" class="chip idle">空闲</span>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <section id="run-box" class="card">
+      <h2>运行控制</h2>
+      <div class="row">
+        <label for="in-mesh" title="电机有限元网格文件（.msh）。默认 model_mirror4.msh。">
+          网格 (.msh)</label>
+        <input id="in-mesh" type="text" spellcheck="false"
+               title="电机有限元网格文件（.msh）。默认 model_mirror4.msh。">
+        <button id="btn-browse-mesh" class="small"
+          title="打开系统文件选择对话框，选电机网格文件 (.msh)">浏览…</button>
+      </div>
+      <div class="row">
+        <label for="in-csv" title="B-H 磁化曲线 CSV。可填相对 legacy/pytorch/ 或绝对路径。默认 50CS470.csv。">
+          B-H 曲线</label>
+        <input id="in-csv" type="text" spellcheck="false"
+               title="B-H 磁化曲线 CSV。可填相对 legacy/pytorch/ 或绝对路径。默认 50CS470.csv。">
+        <button id="btn-browse-csv" class="small"
+          title="打开系统文件选择对话框，选 B-H 磁化曲线 CSV">浏览…</button>
+      </div>
+      <div class="row">
+        <label for="in-steps" title="目标步数。留空 = 用配置里的 max_step（默认 3000）。">
+          目标步数</label>
+        <input id="in-steps" type="number" min="1" step="1"
+               title="目标步数。留空 = 用配置里的 max_step（默认 3000）。">
+      </div>
+      <div class="btnrow">
+        <button id="btn-start" class="primary"
+          title="开始 / 继续：构建 FieldSystem 并跑 MMA。配置改动在点此之后生效。">
+          开始 / 继续</button>
+        <button id="btn-pause"
+          title="暂停：当前步跑完后在步间停下。">暂停</button>
+        <button id="btn-resume"
+          title="继续：解除暂停，接着跑。">继续</button>
+        <button id="btn-step"
+          title="单步：只跑一步然后自动暂停。">单步</button>
+        <button id="btn-stop" class="danger"
+          title="停止：当前步跑完后终止本轮优化。">停止</button>
+      </div>
+      <p id="run-msg" class="muted"></p>
+    </section>
+
+    <section id="save-box" class="card">
+      <h2>保存 / 加载</h2>
+      <div class="row">
+        <label for="in-save-name" title="检查点文件名（不用写 .json）。默认自动生成。">
+          检查点名</label>
+        <input id="in-save-name" type="text" placeholder="checkpoint_xxx" spellcheck="false"
+               title="检查点文件名（不用写 .json）。默认自动生成。">
+      </div>
+      <div class="btnrow">
+        <button id="btn-save"
+          title="把当前优化状态存成检查点（MMA 变量 + AL 状态 + 热启动缓存 + 轨迹）。之后可加载续跑。">
+          保存检查点</button>
+        <button id="btn-reload" title="刷新下方检查点列表。">刷新列表</button>
+      </div>
+      <select id="sel-saves" size="6" title="已保存的检查点，选中后点『加载并续跑』。"></select>
+      <div class="btnrow">
+        <button id="btn-load"
+          title="加载选中的检查点并准备续跑；然后点『开始 / 继续』真正开跑。续跑轨迹与中断前一致。">
+          加载并续跑</button>
+      </div>
+    </section>
+
+    <section id="config-box" class="card">
+      <h2>配置选项
+        <button id="btn-json" class="small"
+          title="展开/收起高级 JSON 配置区（可整体复制、编辑、回填表单）。">
+          高级 JSON</button>
+      </h2>
+      <div id="config-form"></div>
+      <div id="json-box" class="hidden">
+        <textarea id="in-json" rows="14" spellcheck="false"
+          title="完整 RunConfig JSON。点『应用 JSON』把内容回填到表单。"></textarea>
+        <div class="btnrow">
+          <button id="btn-json-apply"
+            title="解析文本框里的 JSON 并覆盖表单所有字段（不立即生效，需点『开始 / 继续』）。">
+            应用 JSON（回填表单）</button>
+        </div>
+      </div>
+    </section>
+  </aside>
+
+  <section id="main-area">
+    <div id="stats" class="card"></div>
+    <div class="card">
+      <h2>转子几何 <span class="muted" id="geom-note"></span></h2>
+      <canvas id="geom"></canvas>
+    </div>
+    <div class="card">
+      <h2>轨迹 <span class="muted" id="traj-note"></span></h2>
+      <canvas id="traj"></canvas>
+    </div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

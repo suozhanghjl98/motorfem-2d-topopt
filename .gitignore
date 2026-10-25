@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# 测试缓存
+.pytest_cache/
+.pytest_cache
+.coverage
+
+# 运行产物（优化日志、NPZ、手绘导出、GUI 状态）
+tools/_out/*
+!tools/_out/.gitkeep
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# 临时文件
+*.tmp
